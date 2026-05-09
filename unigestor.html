@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UniGestor — Gestión Integral</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#6B4EFF;--purple-light:#EDE9FF;--purple-dark:#4A34C8;
+  --sidebar-bg:#1A1040;--bg:#F4F2FF;--white:#fff;
+  --text:#1A1040;--text-muted:#7B7A8E;--border:#E5E3F5;
+  --success:#1D9E75;--success-bg:#E1F5EE;
+  --warning:#BA7517;--warning-bg:#FAEEDA;
+  --danger:#A32D2D;--danger-bg:#FCEBEB;
+  --info:#185FA5;--info-bg:#E6F1FB;
+  --sw:220px;--hh:64px;--r:12px;--rs:8px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+
+/* LOGIN */
+#login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1A1040 0%,#2D1B8E 50%,#6B4EFF 100%);position:relative;overflow:hidden}
+#login-page::before{content:'';position:absolute;width:600px;height:600px;background:rgba(107,78,255,0.15);border-radius:50%;top:-200px;right:-200px}
+#login-page::after{content:'';position:absolute;width:400px;height:400px;background:rgba(107,78,255,0.1);border-radius:50%;bottom:-150px;left:-100px}
+.lbox{background:#fff;border-radius:20px;padding:48px 44px;width:420px;position:relative;z-index:1;box-shadow:0 24px 80px rgba(26,16,64,0.4)}
+.llogo{text-align:center;margin-bottom:32px}
+.licon{width:60px;height:60px;background:var(--purple);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px}
+.lname{font-family:'Sora',sans-serif;font-size:28px;font-weight:700;letter-spacing:-0.5px}
+.lbox label{display:block;font-size:13px;font-weight:500;color:var(--text-muted);margin:20px 0 8px}
+.iw{display:flex;align-items:center;background:#F4F2FF;border:1.5px solid var(--border);border-radius:var(--rs);padding:0 14px;gap:10px}
+.iw input{flex:1;border:none;background:transparent;padding:12px 0;font-family:inherit;font-size:14px;color:var(--text);outline:none}
+.iw .ic{color:var(--text-muted)}
+.btn-login{width:100%;margin-top:28px;padding:14px;background:var(--purple);color:#fff;border:none;border-radius:var(--rs);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s,transform .1s}
+.btn-login:hover{background:var(--purple-dark)}
+.btn-login:active{transform:scale(0.98)}
+.lfooter{text-align:center;margin-top:20px;font-size:12px;color:var(--text-muted)}
+
+/* APP */
+#app{display:none;min-height:100vh}
+.shell{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:var(--sw);background:var(--sidebar-bg);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
+.sbrand{padding:20px 20px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.sbrand .bi{width:36px;height:36px;background:var(--purple);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.sbrand .bn{font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#fff}
+.sbrand .bs{font-size:10px;color:rgba(255,255,255,0.45);margin-top:1px}
+.snav{padding:16px 12px;flex:1;display:flex;flex-direction:column;gap:4px}
+.ni{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--rs);color:rgba(255,255,255,0.7);cursor:pointer;font-size:14px;font-weight:500;border:none;background:transparent;width:100%;text-align:left;transition:background .15s,color .15s}
+.ni span{font-size:16px;width:20px}
+.ni:hover{background:rgba(255,255,255,0.07);color:#fff}
+.ni.active{background:var(--purple);color:#fff}
+.sfooter{padding:16px 12px;border-top:1px solid rgba(255,255,255,0.08)}
+.uchip{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.uav{width:32px;height:32px;background:var(--purple);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.unm{font-size:12px;font-weight:500;color:#fff}
+.uem{font-size:10px;color:rgba(255,255,255,0.4)}
+.btn-logout{display:flex;align-items:center;gap:8px;background:transparent;border:none;color:rgba(255,255,255,0.5);font-family:inherit;font-size:12px;cursor:pointer;padding:6px 4px;transition:color .15s}
+.btn-logout:hover{color:rgba(255,255,255,0.9)}
+
+/* MAIN */
+.main{margin-left:var(--sw);flex:1;min-height:100vh}
+.topbar{background:#fff;height:var(--hh);display:flex;align-items:center;padding:0 28px;border-bottom:1px solid var(--border);gap:12px;position:sticky;top:0;z-index:50}
+.ttl{font-family:'Sora',sans-serif;font-size:18px;font-weight:700;flex:1}
+.tsub{font-size:12px;color:var(--text-muted);margin-top:1px;font-weight:400}
+
+/* NOTIF */
+.nb{position:relative;background:none;border:none;cursor:pointer;padding:7px;border-radius:8px;color:var(--text-muted);font-size:20px;line-height:1;transition:background .15s}
+.nb:hover{background:var(--purple-light);color:var(--purple)}
+.nbadge{position:absolute;top:2px;right:2px;width:16px;height:16px;background:#E24B4A;border-radius:50%;font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+#notif-panel{position:fixed;top:68px;right:20px;width:320px;background:#fff;border-radius:var(--r);border:1px solid var(--border);box-shadow:0 12px 40px rgba(26,16,64,0.18);z-index:200;display:none}
+#notif-panel.open{display:block}
+.nh{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.nht{font-weight:600;font-size:14px}
+.nclr{font-size:11px;color:var(--purple);cursor:pointer;border:none;background:none;font-family:inherit}
+.nitem{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start}
+.nitem:last-child{border-bottom:none}
+.nico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.nd{background:var(--danger-bg)}.nw{background:var(--warning-bg)}.nif{background:var(--info-bg)}
+.ntxt{font-size:12px;color:var(--text);line-height:1.5}
+.ntime{font-size:10px;color:var(--text-muted);margin-top:3px}
+
+/* BUTTONS */
+.bp{background:var(--purple);color:#fff;border:none;border-radius:var(--rs);padding:9px 16px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s,transform .1s;white-space:nowrap}
+.bp:hover{background:var(--purple-dark)}
+.bp:active{transform:scale(0.97)}
+.be{background:var(--purple-light);border:none;color:var(--purple);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;transition:background .15s}
+.be:hover{background:#d8d0ff}
+
+.page-content{padding:28px}
+
+/* ALERT BANNER */
+.abanner{display:flex;align-items:center;gap:12px;background:var(--danger-bg);border:1px solid #F7C1C1;border-radius:var(--rs);padding:12px 16px;margin-bottom:20px}
+.abanner span.txt{font-size:13px;color:var(--danger);font-weight:500;flex:1}
+
+/* STATS */
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.sc{background:#fff;border-radius:var(--r);padding:18px 20px;border:1px solid var(--border)}
+.slbl{font-size:11px;color:var(--text-muted);font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px}
+.sval{font-size:26px;font-weight:700;font-family:'Sora',sans-serif}
+.sbdg{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;margin-top:6px}
+.bu{background:var(--success-bg);color:var(--success)}
+.bd{background:var(--danger-bg);color:var(--danger)}
+.bi2{background:var(--info-bg);color:var(--info)}
+
+/* CARDS */
+.card{background:#fff;border-radius:var(--r);border:1px solid var(--border);overflow:hidden;margin-bottom:20px}
+.ch{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ct{font-size:14px;font-weight:600;flex:1}
+
+/* SEARCH */
+.sbox{display:flex;align-items:center;gap:8px;background:#F4F2FF;border:1px solid var(--border);border-radius:var(--rs);padding:6px 12px}
+.sbox input{border:none;background:transparent;font-family:inherit;font-size:13px;color:var(--text);outline:none;width:180px}
+.fsel{border:1px solid var(--border);border-radius:var(--rs);padding:7px 10px;font-family:inherit;font-size:12px;background:#fff;color:var(--text);outline:none;cursor:pointer}
+.fsel:focus{border-color:var(--purple)}
+
+/* TABLE */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:11px 16px;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;background:#FAFAF8;border-bottom:1px solid var(--border)}
+td{padding:12px 16px;font-size:13px;border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FAFAF8}
+.nr{text-align:center;padding:32px;color:var(--text-muted);font-size:13px;display:none}
+
+/* STATUS */
+.s{display:inline-flex;align-items:center;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.sc2{background:var(--success-bg);color:var(--success)}
+.sp{background:var(--warning-bg);color:var(--warning)}
+.sca{background:var(--danger-bg);color:var(--danger)}
+.sd{background:var(--success-bg);color:var(--success)}
+.sag{background:var(--danger-bg);color:var(--danger)}
+.sa{background:var(--success-bg);color:var(--success)}
+.sin{background:#F1EFE8;color:#5F5E5A}
+.spr{background:var(--info-bg);color:var(--info)}
+
+/* PAGINATION */
+.pag{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--border);background:#FAFAF8}
+.pi{font-size:12px;color:var(--text-muted)}
+.pbtns{display:flex;gap:4px}
+.pb{width:30px;height:30px;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:12px;font-weight:500;color:var(--text);display:flex;align-items:center;justify-content:center;transition:all .15s}
+.pb:hover:not(:disabled){border-color:var(--purple);color:var(--purple)}
+.pb.on{background:var(--purple);border-color:var(--purple);color:#fff}
+.pb:disabled{opacity:0.35;cursor:not-allowed}
+
+/* CHART — FIXED SIZE — THIS IS THE KEY FIX */
+.cc{position:relative;width:100%;height:180px;padding:10px 16px 8px}
+.cc canvas{position:absolute;top:10px;left:16px;right:16px;bottom:8px;width:calc(100% - 32px) !important;height:calc(100% - 18px) !important}
+
+/* PRODUCTS */
+.pl{padding:8px 20px 16px}
+.pr{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.pr:last-child{border-bottom:none}
+.prk{width:20px;font-size:11px;font-weight:700;color:var(--text-muted)}
+.prn{flex:1;font-size:13px;font-weight:500}
+.pbw{width:90px;height:6px;background:var(--purple-light);border-radius:3px}
+.pbb{height:100%;background:var(--purple);border-radius:3px}
+.pu{font-size:12px;font-weight:700;color:var(--purple);min-width:36px;text-align:right}
+
+/* TWO COL */
+.tc{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+
+/* PIE */
+.plr{display:flex;align-items:center;gap:8px;font-size:13px}
+.pd{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.pp{margin-left:auto;font-weight:600}
+
+/* FORMS */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:20px}
+.fgg{display:flex;flex-direction:column;gap:6px}
+.fgl{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px}
+.fc{border:1px solid var(--border);border-radius:var(--rs);padding:9px 12px;font-family:inherit;font-size:13px;background:#fff;color:var(--text);outline:none;width:100%}
+.fc:focus{border-color:var(--purple)}
+
+/* PAGES */
+.page{display:none}
+.page.active{display:block}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="login-page">
+  <div class="lbox">
+    <div class="llogo">
+      <div class="licon">🏢</div>
+      <div class="lname">UniGestor</div>
+    </div>
+    <label>Correo electrónico</label>
+    <div class="iw"><span class="ic">✉</span><input type="email" id="le" placeholder="usuario@empresa.com" value="administrador@empresa.com"></div>
+    <label>Contraseña</label>
+    <div class="iw"><span class="ic">🔒</span><input type="password" id="lp" placeholder="••••••••••" value="password123"></div>
+    <button class="btn-login" onclick="doLogin()">Iniciar sesión</button>
+    <div class="lfooter">UniGestor © 2026 — Gestión Integral</div>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="app">
+<div class="shell">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sbrand">
+    <div class="bi">🏢</div>
+    <div><div class="bn">UniGestor</div><div class="bs">Gestión Integral</div></div>
+  </div>
+  <nav class="snav">
+    <button class="ni active" onclick="nav('dashboard',this)"><span>📊</span> Dashboard</button>
+    <button class="ni" onclick="nav('ventas',this)"><span>🛒</span> Ventas</button>
+    <button class="ni" onclick="nav('inventario',this)"><span>📦</span> Inventario</button>
+    <button class="ni" onclick="nav('clientes',this)"><span>👥</span> Clientes</button>
+    <button class="ni" onclick="nav('reportes',this)"><span>📈</span> Reportes</button>
+  </nav>
+  <div class="sfooter">
+    <div class="uchip">
+      <div class="uav">AD</div>
+      <div><div class="unm">Administrador</div><div class="uem">administrador@empresa.com</div></div>
+    </div>
+    <button class="btn-logout" onclick="doLogout()">⬅ Cerrar sesión</button>
+  </div>
+</aside>
+
+<!-- NOTIFICATION PANEL -->
+<div id="notif-panel">
+  <div class="nh"><span class="nht">🔔 Alertas</span><button class="nclr" onclick="clearNotifs()">Marcar todo leído</button></div>
+  <div class="nitem"><div class="nico nd">🚨</div><div><div class="ntxt"><strong>Teclado Mecánico RGB</strong> — Stock agotado (0 u.)</div><div class="ntime">Hace 2 horas</div></div></div>
+  <div class="nitem"><div class="nico nd">🚨</div><div><div class="ntxt"><strong>Auriculares Bluetooth Sony</strong> — Stock agotado (0 u.)</div><div class="ntime">Hace 5 horas</div></div></div>
+  <div class="nitem"><div class="nico nw">⚠️</div><div><div class="ntxt"><strong>Monitor Dell 24"</strong> — Stock bajo (3 u.). Reabastecer pronto.</div><div class="ntime">Hace 1 día</div></div></div>
+  <div class="nitem"><div class="nico nw">⚠️</div><div><div class="ntxt"><strong>Mouse Logitech</strong> — Stock bajo (2 u.).</div><div class="ntime">Hace 1 día</div></div></div>
+  <div class="nitem"><div class="nico nif">📦</div><div><div class="ntxt">Venta pendiente de <strong>Yary Yulieth Cárdenas</strong> por $320.</div><div class="ntime">Hace 3 días</div></div></div>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- ── DASHBOARD ── -->
+<div id="page-dashboard" class="page active">
+  <div class="topbar">
+    <div style="flex:1"><div class="ttl">Dashboard</div><div class="tsub">Bienvenido de vuelta, Administrador</div></div>
+    <button class="nb" onclick="toggleNotif()">🔔<span class="nbadge" id="nc1">5</span></button>
+  </div>
+  <div class="page-content">
+    <div class="abanner"><span style="font-size:18px">🚨</span><span class="txt">2 productos <strong>agotados</strong> y 2 con <strong>stock bajo</strong>. Revisa el inventario.</span><button class="be" onclick="nav('inventario',document.querySelectorAll('.ni')[3])">Ver inventario</button></div>
+    <div class="sgrid">
+      <div class="sc"><div class="slbl">Ventas Totales</div><div class="sval">$510</div><div class="sbdg bu">↑ +12% este mes</div></div>
+      <div class="sc"><div class="slbl">Ingresos Totales</div><div class="sval">$12,345</div><div class="sbdg bu">↑ +6% este mes</div></div>
+      <div class="sc"><div class="slbl">Clientes Atendidos</div><div class="sval">49</div><div class="sbdg bu">↑ +5 este mes</div></div>
+      <div class="sc"><div class="slbl">Productos Vendidos</div><div class="sval">120</div><div class="sbdg bd">↓ -2% este mes</div></div>
+    </div>
+    <div class="tc">
+      <div class="card"><div class="ch"><div class="ct">📈 Ventas por día</div></div><div class="cc"><canvas id="c-dash-l"></canvas></div></div>
+      <div class="card"><div class="ch"><div class="ct">🏆 Productos más vendidos</div></div>
+        <div class="pl">
+          <div class="pr"><span class="prk">1</span><div class="prn">Producto A</div><div class="pbw"><div class="pbb" style="width:96%"></div></div><div class="pu">48 u.</div></div>
+          <div class="pr"><span class="prk">2</span><div class="prn">Producto B</div><div class="pbw"><div class="pbb" style="width:83%"></div></div><div class="pu">40 u.</div></div>
+          <div class="pr"><span class="prk">3</span><div class="prn">Producto C</div><div class="pbw"><div class="pbb" style="width:50%"></div></div><div class="pu">24 u.</div></div>
+          <div class="pr"><span class="prk">4</span><div class="prn">Producto D</div><div class="pbw"><div class="pbb" style="width:58%"></div></div><div class="pu">28 u.</div></div>
+          <div class="pr"><span class="prk">5</span><div class="prn">Producto E</div><div class="pbw"><div class="pbb" style="width:50%"></div></div><div class="pu">24 u.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card"><div class="ch"><div class="ct">🛒 Últimas ventas</div></div>
+      <div class="tw"><table><thead><tr><th>Fecha</th><th>Cliente</th><th>Producto(s)</th><th>Cant.</th><th>Total</th><th>Estado</th></tr></thead>
+      <tbody>
+        <tr><td>16/06/2024</td><td>Patrick Geordy</td><td>Producto A, Producto B</td><td>3</td><td>$150</td><td><span class="s sc2">Completada</span></td></tr>
+        <tr><td>16/06/2024</td><td>Yary Yulieth Cárdenas</td><td>Producto B, Producto C</td><td>4</td><td>$320</td><td><span class="s sp">Pendiente</span></td></tr>
+        <tr><td>14/06/2024</td><td>Deisy Mayerly Bermúdez</td><td>Producto C</td><td>1</td><td>$50</td><td><span class="s sca">Cancelada</span></td></tr>
+        <tr><td>13/06/2024</td><td>Diego Fernando Gómez</td><td>Producto A</td><td>2</td><td>$100</td><td><span class="s sc2">Completada</span></td></tr>
+        <tr><td>12/06/2024</td><td>Jinneth Paola Sierra</td><td>Producto E</td><td>5</td><td>$200</td><td><span class="s sc2">Completada</span></td></tr>
+        <tr><td>10/06/2024</td><td>Rafael Humberto Barros</td><td>Producto B</td><td>6</td><td>$240</td><td><span class="s sc2">Completada</span></td></tr>
+      </tbody></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── VENTAS ── -->
+<div id="page-ventas" class="page">
+  <div class="topbar">
+    <div style="flex:1"><div class="ttl">Ventas</div><div class="tsub">Gestión y registro de las ventas</div></div>
+    <button class="nb" onclick="toggleNotif()">🔔<span class="nbadge">5</span></button>
+    <button class="bp" onclick="showModal('venta')">+ Nueva Venta</button>
+  </div>
+  <div class="page-content">
+    <div class="sgrid">
+      <div class="sc"><div class="slbl">Ventas Totales</div><div class="sval">$510</div><div class="sbdg bu">↑ +12%</div></div>
+      <div class="sc"><div class="slbl">Ingresos Totales</div><div class="sval">$12,345</div><div class="sbdg bu">↑ +6%</div></div>
+      <div class="sc"><div class="slbl">Clientes Atendidos</div><div class="sval">49</div><div class="sbdg bu">↑ +5</div></div>
+      <div class="sc"><div class="slbl">Productos Vendidos</div><div class="sval">120</div><div class="sbdg bd">↓ -2%</div></div>
+    </div>
+    <div class="card">
+      <div class="ch">
+        <div class="ct">Registro de Ventas</div>
+        <div class="sbox"><span>🔍</span><input type="text" id="sv" placeholder="Buscar cliente o producto..." oninput="ft('v')"></div>
+        <select class="fsel" id="fev" onchange="ft('v')"><option value="">Todos los estados</option><option>Completada</option><option>Pendiente</option><option>Cancelada</option></select>
+      </div>
+      <div class="tw"><table><thead><tr><th>Fecha</th><th>Cliente</th><th>Producto(s)</th><th>Cant.</th><th>Total</th><th>Estado</th><th>Acción</th></tr></thead>
+      <tbody id="tbv">
+        <tr data-s="patrick geordy producto a producto b completada"><td>16/06/2024</td><td>Patrick Geordy</td><td>Producto A, Producto B</td><td>3</td><td>$150</td><td><span class="s sc2">Completada</span></td><td><button class="be" onclick="showModal('venta')">✏ Editar</button></td></tr>
+        <tr data-s="yary yulieth cárdenas producto b producto c pendiente"><td>16/06/2024</td><td>Yary Yulieth Cárdenas</td><td>Producto B, Producto C</td><td>4</td><td>$320</td><td><span class="s sp">Pendiente</span></td><td><button class="be" onclick="showModal('venta')">✏ Editar</button></td></tr>
+        <tr data-s="deisy mayerly bermúdez producto c cancelada"><td>14/06/2024</td><td>Deisy Mayerly Bermúdez</td><td>Producto C</td><td>1</td><td>$50</td><td><span class="s sca">Cancelada</span></td><td><button class="be" onclick="showModal('venta')">✏ Editar</button></td></tr>
+        <tr data-s="diego fernando gómez producto a completada"><td>13/06/2024</td><td>Diego Fernando Gómez</td><td>Producto A</td><td>2</td><td>$100</td><td><span class="s sc2">Completada</span></td><td><button class="be" onclick="showModal('venta')">✏ Editar</button></td></tr>
+        <tr data-s="jinneth paola sierra producto e completada"><td>12/06/2024</td><td>Jinneth Paola Sierra</td><td>Producto E</td><td>5</td><td>$200</td><td><span class="s sc2">Completada</span></td><td><button class="be" onclick="showModal('venta')">✏ Editar</button></td></tr>
+        <tr data-s="rafael humberto barros producto b completada"><td>10/06/2024</td><td>Rafael Humberto Barros</td><td>Producto B</td><td>6</td><td>$240</td><td><span class="s sc2">Completada</span></td><td><button class="be" onclick="showModal('venta')">✏ Editar</button></td></tr>
+        <tr data-s="karlos gledys producto a pendiente"><td>08/06/2024</td><td>Karlos Gledys</td><td>Producto A</td><td>2</td><td>$90</td><td><span class="s sp">Pendiente</span></td><td><button class="be" onclick="showModal('venta')">✏ Editar</button></td></tr>
+        <tr data-s="hay yaleth cárdenas producto d completada"><td>07/06/2024</td><td>Hay Yaleth Cárdenas</td><td>Producto D</td><td>3</td><td>$180</td><td><span class="s sc2">Completada</span></td><td><button class="be" onclick="showModal('venta')">✏ Editar</button></td></tr>
+        <tr data-s="deisy millery benavídez producto e cancelada"><td>05/06/2024</td><td>Deisy Millery Benavídez</td><td>Producto E</td><td>1</td><td>$40</td><td><span class="s sca">Cancelada</span></td><td><button class="be" onclick="showModal('venta')">✏ Editar</button></td></tr>
+        <tr data-s="patrick geordy producto c completada"><td>03/06/2024</td><td>Patrick Geordy</td><td>Producto C</td><td>4</td><td>$210</td><td><span class="s sc2">Completada</span></td><td><button class="be" onclick="showModal('venta')">✏ Editar</button></td></tr>
+      </tbody></table>
+      <div id="nrv" class="nr">No se encontraron ventas.</div></div>
+      <div class="pag"><span class="pi" id="piv"></span><div class="pbtns" id="pbv"></div></div>
+    </div>
+    <div class="card"><div class="ch"><div class="ct">📈 Ventas por día</div></div><div class="cc"><canvas id="c-v-l"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ── INVENTARIO ── -->
+<div id="page-inventario" class="page">
+  <div class="topbar">
+    <div style="flex:1"><div class="ttl">Inventario</div><div class="tsub">Gestión y control del inventario</div></div>
+    <button class="nb" onclick="toggleNotif()">🔔<span class="nbadge">5</span></button>
+    <button class="bp" onclick="showModal('producto')">+ Nuevo Producto</button>
+  </div>
+  <div class="page-content">
+    <div class="abanner"><span style="font-size:18px">🚨</span><span class="txt"><strong>Teclado Mecánico RGB</strong> y <strong>Auriculares Bluetooth Sony</strong> agotados. <strong>Monitor Dell 24"</strong> y <strong>Mouse Logitech</strong> con stock bajo.</span></div>
+    <div class="sgrid">
+      <div class="sc"><div class="slbl">Total Productos</div><div class="sval">8</div></div>
+      <div class="sc"><div class="slbl">Valor Inventario</div><div class="sval">$18,619</div></div>
+      <div class="sc"><div class="slbl">Stock Bajo</div><div class="sval">2</div><div class="sbdg bd">⚠ Revisar</div></div>
+      <div class="sc"><div class="slbl">Agotados</div><div class="sval">2</div><div class="sbdg bd">Sin stock</div></div>
+    </div>
+    <div class="card">
+      <div class="ch">
+        <div class="ct">Catálogo de Productos</div>
+        <div class="sbox"><span>🔍</span><input type="text" id="si" placeholder="Buscar producto o SKU..." oninput="ft('i')"></div>
+        <select class="fsel" id="fci" onchange="ft('i')"><option value="">Todas las categorías</option><option>Electrónica</option><option>Oficina</option><option>Ropa</option></select>
+        <select class="fsel" id="fei" onchange="ft('i')"><option value="">Todos los estados</option><option>Disponible</option><option>Agotado</option><option>Pendiente</option></select>
+      </div>
+      <div class="tw"><table><thead><tr><th>Nombre</th><th>SKU</th><th>Categoría</th><th>Stock</th><th>Precio</th><th>Estado</th><th>Acc.</th></tr></thead>
+      <tbody id="tbi">
+        <tr data-s="laptop hp probook 450 hp-pb450-001 electrónica disponible"><td><strong>Laptop HP ProBook 450</strong></td><td style="color:var(--text-muted);font-size:12px">HP-PB450-001</td><td>Electrónica</td><td>15</td><td>$899</td><td><span class="s sd">Disponible</span></td><td><button class="be" onclick="showModal('producto')">✏</button></td></tr>
+        <tr data-s="monitor dell 24 dell-m24-002 electrónica pendiente"><td><strong>Monitor Dell 24"</strong></td><td style="color:var(--text-muted);font-size:12px">DELL-M24-002</td><td>Electrónica</td><td style="color:var(--warning);font-weight:600">3 ⚠</td><td>$189</td><td><span class="s sp">Pendiente</span></td><td><button class="be" onclick="showModal('producto')">✏</button></td></tr>
+        <tr data-s="silla ergonómica premium sil-erg-003 oficina disponible"><td><strong>Silla Ergonómica Premium</strong></td><td style="color:var(--text-muted);font-size:12px">SIL-ERG-003</td><td>Oficina</td><td>8</td><td>$159</td><td><span class="s sd">Disponible</span></td><td><button class="be" onclick="showModal('producto')">✏</button></td></tr>
+        <tr data-s="teclado mecánico rgb tec-mec-004 electrónica agotado"><td><strong>Teclado Mecánico RGB</strong></td><td style="color:var(--text-muted);font-size:12px">TEC-MEC-004</td><td>Electrónica</td><td style="color:var(--danger);font-weight:600">0 🚨</td><td>$79</td><td><span class="s sag">Agotado</span></td><td><button class="be" onclick="showModal('producto')">✏</button></td></tr>
+        <tr data-s="camiseta polo empresarial cam-pol-005 ropa disponible"><td><strong>Camiseta Polo Empresarial</strong></td><td style="color:var(--text-muted);font-size:12px">CAM-POL-005</td><td>Ropa</td><td>45</td><td>$29</td><td><span class="s sd">Disponible</span></td><td><button class="be" onclick="showModal('producto')">✏</button></td></tr>
+        <tr data-s="mouse inalámbrico logitech mou-log-006 electrónica pendiente"><td><strong>Mouse Inalámbrico Logitech</strong></td><td style="color:var(--text-muted);font-size:12px">MOU-LOG-006</td><td>Electrónica</td><td style="color:var(--warning);font-weight:600">2 ⚠</td><td>$35</td><td><span class="s sp">Pendiente</span></td><td><button class="be" onclick="showModal('producto')">✏</button></td></tr>
+        <tr data-s="escritorio modular 160cm esc-mod-007 oficina disponible"><td><strong>Escritorio Modular 160cm</strong></td><td style="color:var(--text-muted);font-size:12px">ESC-MOD-007</td><td>Oficina</td><td>8</td><td>$320</td><td><span class="s sd">Disponible</span></td><td><button class="be" onclick="showModal('producto')">✏</button></td></tr>
+        <tr data-s="auriculares bluetooth sony aur-son-008 electrónica agotado"><td><strong>Auriculares Bluetooth Sony</strong></td><td style="color:var(--text-muted);font-size:12px">AUR-SON-008</td><td>Electrónica</td><td style="color:var(--danger);font-weight:600">0 🚨</td><td>$159</td><td><span class="s sag">Agotado</span></td><td><button class="be" onclick="showModal('producto')">✏</button></td></tr>
+      </tbody></table>
+      <div id="nri" class="nr">No se encontraron productos.</div></div>
+      <div class="pag"><span class="pi" id="pii"></span><div class="pbtns" id="pbi"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── CLIENTES ── -->
+<div id="page-clientes" class="page">
+  <div class="topbar">
+    <div style="flex:1"><div class="ttl">Clientes</div><div class="tsub">Gestión de clientes y contactos</div></div>
+    <button class="nb" onclick="toggleNotif()">🔔<span class="nbadge">5</span></button>
+    <button class="bp" onclick="showModal('cliente')">+ Nuevo Cliente</button>
+  </div>
+  <div class="page-content">
+    <div class="sgrid">
+      <div class="sc"><div class="slbl">Total Clientes</div><div class="sval">50</div></div>
+      <div class="sc"><div class="slbl">Prospectos</div><div class="sval">12</div><div class="sbdg bi2">Nuevos leads</div></div>
+      <div class="sc"><div class="slbl">Inactivos</div><div class="sval">6</div><div class="sbdg bd">Sin actividad</div></div>
+      <div class="sc"><div class="slbl">Ciudades</div><div class="sval">3</div><div class="sbdg bu">Bogotá · Medellín · Cali</div></div>
+    </div>
+    <div class="card">
+      <div class="ch">
+        <div class="ct">Directorio de Clientes</div>
+        <div class="sbox"><span>🔍</span><input type="text" id="sc2" placeholder="Buscar por nombre o ciudad..." oninput="ft('c')"></div>
+        <select class="fsel" id="fec" onchange="ft('c')"><option value="">Todos los estados</option><option>Activo</option><option>Inactivo</option><option>Prospecto</option></select>
+      </div>
+      <div class="tw"><table><thead><tr><th>Cliente</th><th>Teléfono</th><th>Ciudad</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody id="tbc">
+        <tr data-s="Camila Pulido bogotá activo"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:50%;background:var(--purple-light);color:var(--purple);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">KG</div><div><div style="font-weight:500">Camila Pulido</div><div style="font-size:11px;color:var(--text-muted)">karlos@gmail.com</div></div></div></td><td>310 234 5678</td><td>Bogotá</td><td><span class="s sa">Activo</span></td><td><button class="be" onclick="showModal('cliente')">✏ Editar</button></td></tr>
+        <tr data-s="Yary yaleth cárdenas medellín activo"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:50%;background:var(--success-bg);color:var(--success);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">HY</div><div><div style="font-weight:500">Yary Yulieth Cárdenas</div><div style="font-size:11px;color:var(--text-muted)">hyaleth@gmail.com</div></div></div></td><td>315 876 4321</td><td>Medellín</td><td><span class="s sa">Activo</span></td><td><button class="be" onclick="showModal('cliente')">✏ Editar</button></td></tr>
+        <tr data-s="Deisy Mayerly Benavídez cali prospecto"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:50%;background:var(--warning-bg);color:var(--warning);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">DB</div><div><div style="font-weight:500">Deisy Mayerly Bermudez</div><div style="font-size:11px;color:var(--text-muted)">deisy@gmail.com</div></div></div></td><td>300 112 9988</td><td>Cali</td><td><span class="s spr">Prospecto</span></td><td><button class="be" onclick="showModal('cliente')">✏ Editar</button></td></tr>
+        <tr data-s="Patrick Geordy bogotá activo"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:50%;background:var(--danger-bg);color:var(--danger);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">PG</div><div><div style="font-weight:500">Patrick Geordy</div><div style="font-size:11px;color:var(--text-muted)">patrick@gmail.com</div></div></div></td><td>312 445 6789</td><td>Bogotá</td><td><span class="s sa">Activo</span></td><td><button class="be" onclick="showModal('cliente')">✏ Editar</button></td></tr>
+        <tr data-s="Diego Fernando Gómez medellín inactivo"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:50%;background:#F1EFE8;color:#5F5E5A;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">DG</div><div><div style="font-weight:500">Diego Fernando Gómez</div><div style="font-size:11px;color:var(--text-muted)">dfgomez@gmail.com</div></div></div></td><td>301 778 3456</td><td>Medellín</td><td><span class="s sin">Inactivo</span></td><td><button class="be" onclick="showModal('cliente')">✏ Editar</button></td></tr>
+        <tr data-s="Jinneth Paola Sierra bogotá activo"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:50%;background:var(--info-bg);color:var(--info);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">JP</div><div><div style="font-weight:500">Jinneth Paola Sierra</div><div style="font-size:11px;color:var(--text-muted)">jinneth@gmail.com</div></div></div></td><td>318 992 0011</td><td>Bogotá</td><td><span class="s sa">Activo</span></td><td><button class="be" onclick="showModal('cliente')">✏ Editar</button></td></tr>
+        <tr data-s="Rafael Humberto Barros cali prospecto"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:50%;background:var(--purple-light);color:var(--purple);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">RB</div><div><div style="font-weight:500">Rafael Humberto Barros</div><div style="font-size:11px;color:var(--text-muted)">rafaelh@gmail.com</div></div></div></td><td>305 663 7722</td><td>Cali</td><td><span class="s spr">Prospecto</span></td><td><button class="be" onclick="showModal('cliente')">✏ Editar</button></td></tr>
+      </tbody></table>
+      <div id="nrc" class="nr">No se encontraron clientes.</div></div>
+      <div class="pag"><span class="pi" id="pic"></span><div class="pbtns" id="pbc"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── REPORTES ── -->
+<div id="page-reportes" class="page">
+  <div class="topbar">
+    <div style="flex:1"><div class="ttl">Reportes</div><div class="tsub">Resumen general de ventas e inventario</div></div>
+    <button class="nb" onclick="toggleNotif()">🔔<span class="nbadge">5</span></button>
+    <button class="bp">📥 Exportar Informe</button>
+  </div>
+  <div class="page-content">
+    <div class="sgrid">
+      <div class="sc"><div class="slbl">Ventas Totales</div><div class="sval">$510</div><div class="sbdg bu">↑ +12% este mes</div></div>
+      <div class="sc"><div class="slbl">Ingresos Totales</div><div class="sval">$12,345</div><div class="sbdg bu">↑ +6% este mes</div></div>
+      <div class="sc"><div class="slbl">Clientes Totales</div><div class="sval">49</div><div class="sbdg bu">↑ +5 este mes</div></div>
+      <div class="sc"><div class="slbl">Unidades Vendidas</div><div class="sval">120</div><div class="sbdg bd">↓ -2% este mes</div></div>
+    </div>
+    <div class="tc">
+      <div class="card"><div class="ch"><div class="ct">📊 Ventas por mes</div></div><div class="cc"><canvas id="c-r-b"></canvas></div></div>
+      <div class="card"><div class="ch"><div class="ct">🥧 Ventas por categoría</div></div>
+        <div style="display:flex;align-items:center;gap:20px;padding:20px">
+          <canvas id="c-r-p" width="130" height="130" style="flex-shrink:0"></canvas>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="plr"><div class="pd" style="background:#6B4EFF"></div>Electrónica<span class="pp">40%</span></div>
+            <div class="plr"><div class="pd" style="background:#1D9E75"></div>Accesorios<span class="pp">23%</span></div>
+            <div class="plr"><div class="pd" style="background:#C4B8FF"></div>Otros<span class="pp">37%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch">
+        <div class="ct">🏆 Productos más vendidos</div>
+        <div class="sbox"><span>🔍</span><input type="text" id="sr" placeholder="Buscar producto..." oninput="ft('r')"></div>
+      </div>
+      <div class="tw"><table><thead><tr><th>Producto</th><th>Categoría</th><th>Unidades</th><th>Ingresos</th></tr></thead>
+      <tbody id="tbr">
+        <tr data-s="producto a electrónica"><td><strong>Producto A</strong></td><td>Electrónica</td><td>48</td><td>$4,800</td></tr>
+        <tr data-s="producto b accesorios"><td><strong>Producto B</strong></td><td>Accesorios</td><td>40</td><td>$3,200</td></tr>
+        <tr data-s="producto c otros"><td><strong>Producto C</strong></td><td>Otros</td><td>24</td><td>$1,440</td></tr>
+        <tr data-s="producto d electrónica"><td><strong>Producto D</strong></td><td>Electrónica</td><td>28</td><td>$2,800</td></tr>
+        <tr data-s="producto e otros"><td><strong>Producto E</strong></td><td>Otros</td><td>24</td><td>$1,920</td></tr>
+      </tbody></table>
+      <div id="nrr" class="nr">No se encontraron productos.</div></div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+</div>
+
+<!-- MODAL -->
+<div id="mo" onclick="closeModal()" style="display:none;position:fixed;inset:0;background:rgba(26,16,64,0.55);z-index:300"></div>
+<div id="mb" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;z-index:301;width:480px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 80px rgba(26,16,64,0.35)"><div id="mi"></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+// ═══ CHARTS — destroy & recreate each time, animation:false prevents stretching ═══
+const CH={};
+
+function mkChart(id,type,data,opts){
+  if(CH[id]){CH[id].destroy();delete CH[id];}
+  const el=document.getElementById(id);
+  if(!el) return;
+  // Reset any inline dimensions so CSS controls size
+  el.style.width='';el.style.height='';
+  CH[id]=new Chart(el,{type,data,options:{...opts,animation:false,responsive:true,maintainAspectRatio:false}});
+}
+
+const LD={
+  labels:['1 Jun','5 Jun','10 Jun','15 Jun','20 Jun','25 Jun','30 Jun'],
+  datasets:[{data:[40,65,55,90,75,110,95],borderColor:'#6B4EFF',backgroundColor:'rgba(107,78,255,0.08)',tension:0.4,fill:true,pointBackgroundColor:'#6B4EFF',pointRadius:4,pointHoverRadius:6,borderWidth:2}]
+};
+const LO={plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#7B7A8E',font:{size:11}}},y:{grid:{color:'#F4F2FF'},ticks:{color:'#7B7A8E',font:{size:11}}}}};
+const BD={
+  labels:['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
+  datasets:[{data:[8200,9400,7800,11200,10500,12345,0,0,0,0,0,0],backgroundColor:(c)=>c.raw>0?'#6B4EFF':'#EDE9FF',borderRadius:6}]
+};
+const BO={plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#7B7A8E',font:{size:10}}},y:{grid:{color:'#F4F2FF'},ticks:{color:'#7B7A8E',font:{size:10},callback:v=>'$'+(v/1000).toFixed(0)+'k'}}}};
+const PD={labels:['Electrónica','Accesorios','Otros'],datasets:[{data:[40,23,37],backgroundColor:['#6B4EFF','#1D9E75','#C4B8FF'],borderWidth:0}]};
+const PO={plugins:{legend:{display:false}},cutout:'65%'};
+
+// ═══ NAV ═══
+function nav(pg,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+pg).classList.add('active');
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  closeNotif();
+  // Use double rAF: first frame applies display:block, second frame has correct layout dimensions
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    if(pg==='dashboard') mkChart('c-dash-l','line',clone(LD),clone(LO));
+    if(pg==='ventas'){mkChart('c-v-l','line',clone(LD),clone(LO));initPag('v',5);}
+    if(pg==='inventario') initPag('i',5);
+    if(pg==='clientes') initPag('c2',5);
+    if(pg==='reportes'){
+      mkChart('c-r-b','bar',clone(BD),clone(BO));
+      mkChart('c-r-p','doughnut',clone(PD),clone(PO));
+    }
+  }));
+}
+function clone(o){return JSON.parse(JSON.stringify(o))}
+
+// ═══ AUTH ═══
+function doLogin(){
+  if(!document.getElementById('le').value||!document.getElementById('lp').value){alert('Ingresa correo y contraseña.');return;}
+  document.getElementById('login-page').style.display='none';
+  document.getElementById('app').style.display='block';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    mkChart('c-dash-l','line',clone(LD),clone(LO));
+    initPag('v',5);initPag('i',5);initPag('c2',5);
+  }));
+}
+function doLogout(){
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-page').style.display='flex';
+  Object.values(CH).forEach(c=>c.destroy());
+  Object.keys(CH).forEach(k=>delete CH[k]);
+}
+
+// ═══ NOTIFICATIONS ═══
+let nOpen=false;
+function toggleNotif(){nOpen=!nOpen;document.getElementById('notif-panel').classList.toggle('open',nOpen);}
+function closeNotif(){nOpen=false;document.getElementById('notif-panel').classList.remove('open');}
+function clearNotifs(){
+  document.querySelectorAll('.nbadge').forEach(b=>b.style.display='none');
+  document.getElementById('notif-panel').innerHTML='<div style="padding:32px;text-align:center;color:var(--text-muted);font-size:13px">✅ Sin alertas pendientes</div>';
+}
+document.addEventListener('click',e=>{if(!e.target.closest('.nb')&&!e.target.closest('#notif-panel'))closeNotif();});
+
+// ═══ SEARCH / FILTER ═══
+const TCFG={
+  v:{tbId:'tbv',nrId:'nrv',pagId:'v',perPage:5,
+     getQ:()=>document.getElementById('sv').value.toLowerCase(),
+     extra:()=>{const v=document.getElementById('fev').value.toLowerCase();return r=>!v||r.dataset.s.includes(v);}},
+  i:{tbId:'tbi',nrId:'nri',pagId:'i',perPage:5,
+     getQ:()=>document.getElementById('si').value.toLowerCase(),
+     extra:()=>{const a=document.getElementById('fci').value.toLowerCase(),b=document.getElementById('fei').value.toLowerCase();return r=>(!a||r.dataset.s.includes(a))&&(!b||r.dataset.s.includes(b));}},
+  c:{tbId:'tbc',nrId:'nrc',pagId:'c2',perPage:5,
+     getQ:()=>document.getElementById('sc2').value.toLowerCase(),
+     extra:()=>{const v=document.getElementById('fec').value.toLowerCase();return r=>!v||r.dataset.s.includes(v);}},
+  r:{tbId:'tbr',nrId:'nrr',pagId:null,perPage:999,
+     getQ:()=>document.getElementById('sr').value.toLowerCase(),
+     extra:()=>()=>true}
+};
+
+function ft(key){
+  const cfg=TCFG[key];
+  const q=cfg.getQ(),efn=cfg.extra();
+  const rows=[...document.querySelectorAll('#'+cfg.tbId+' tr')];
+  rows.forEach(r=>r.style.display='');
+  const vis=rows.filter(r=>r.dataset.s.includes(q)&&efn(r));
+  rows.forEach(r=>{if(!vis.includes(r))r.style.display='none';});
+  document.getElementById(cfg.nrId).style.display=vis.length?'none':'block';
+  if(cfg.pagId){PS[cfg.pagId]={page:1,perPage:cfg.perPage};rPag(cfg.pagId);}
+}
+
+// ═══ PAGINATION ═══
+const PS={};
+const PCFG={
+  v:{tbId:'tbv',piId:'piv',pbId:'pbv'},
+  i:{tbId:'tbi',piId:'pii',pbId:'pbi'},
+  c2:{tbId:'tbc',piId:'pic',pbId:'pbc'}
+};
+
+function initPag(id,perPage){PS[id]={page:1,perPage};rPag(id);}
+
+function rPag(id){
+  const cfg=PCFG[id],st=PS[id]||{page:1,perPage:5};
+  const rows=[...document.querySelectorAll('#'+cfg.tbId+' tr')];
+  // visible = not hidden by search
+  const vis=rows.filter(r=>r.style.display!=='none');
+  const total=vis.length,pages=Math.max(1,Math.ceil(total/st.perPage));
+  if(st.page>pages)st.page=pages;
+  const start=(st.page-1)*st.perPage,end=start+st.perPage;
+  // Hide all, show only current page slice
+  rows.forEach(r=>r.style.display='none');
+  vis.slice(start,end).forEach(r=>r.style.display='');
+
+  document.getElementById(cfg.piId).textContent=total===0?'Sin resultados':`Mostrando ${Math.min(start+1,total)}–${Math.min(end,total)} de ${total}`;
+  const pb=document.getElementById(cfg.pbId);pb.innerHTML='';
+  const mkb=(txt,act,dis)=>{const b=document.createElement('button');b.className='pb'+(act?' on':'');b.textContent=txt;b.disabled=dis;b.onclick=act?null:()=>{};return b;};
+  const prev=document.createElement('button');prev.className='pb';prev.textContent='‹';prev.disabled=st.page===1;prev.onclick=()=>{st.page--;rPag(id);};pb.appendChild(prev);
+  for(let p=1;p<=pages;p++){
+    const b=document.createElement('button');b.className='pb'+(p===st.page?' on':'');b.textContent=p;
+    (p=>b.onclick=()=>{st.page=p;rPag(id);})(p);pb.appendChild(b);
+  }
+  const next=document.createElement('button');next.className='pb';next.textContent='›';next.disabled=st.page===pages;next.onclick=()=>{st.page++;rPag(id);};pb.appendChild(next);
+}
+
+// ═══ MODAL ═══
+const MTPL={
+  venta:`<div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between"><div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700">Nueva Venta</div><button onclick="closeModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted)">✕</button></div><div class="fg"><div class="fgg"><label class="fgl">Fecha</label><input type="date" class="fc"></div><div class="fgg"><label class="fgl">Cliente</label><select class="fc"><option>Patrick Geordy</option><option>Yary Yulieth Cárdenas</option><option>Deisy Mayerly Bermúdez</option><option>Karlos Gledys</option></select></div><div class="fgg" style="grid-column:1/-1"><label class="fgl">Producto(s)</label><select class="fc"><option>Producto A</option><option>Producto B</option><option>Producto C</option><option>Producto D</option><option>Producto E</option></select></div><div class="fgg"><label class="fgl">Cantidad</label><input type="number" class="fc" value="1" min="1"></div><div class="fgg"><label class="fgl">Estado</label><select class="fc"><option>Completada</option><option>Pendiente</option><option>Cancelada</option></select></div></div><div style="padding:0 20px 20px;display:flex;gap:10px;justify-content:flex-end"><button onclick="closeModal()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:9px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit">Cancelar</button><button onclick="closeModal()" style="background:var(--purple);color:#fff;border:none;padding:9px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600">Guardar Venta</button></div>`,
+  producto:`<div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between"><div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700">Nuevo Producto</div><button onclick="closeModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted)">✕</button></div><div class="fg"><div class="fgg" style="grid-column:1/-1"><label class="fgl">Nombre del Producto</label><input type="text" class="fc" placeholder="Ej: Laptop HP ProBook 450"></div><div class="fgg"><label class="fgl">SKU</label><input type="text" class="fc" placeholder="HP-PB450-001"></div><div class="fgg"><label class="fgl">Categoría</label><select class="fc"><option>Electrónica</option><option>Oficina</option><option>Ropa</option></select></div><div class="fgg"><label class="fgl">Stock</label><input type="number" class="fc" value="0" min="0"></div><div class="fgg"><label class="fgl">Precio ($)</label><input type="number" class="fc" value="0"></div><div class="fgg" style="grid-column:1/-1"><label class="fgl">Estado</label><select class="fc"><option>Disponible</option><option>Agotado</option><option>Pendiente</option></select></div></div><div style="padding:0 20px 20px;display:flex;gap:10px;justify-content:flex-end"><button onclick="closeModal()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:9px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit">Cancelar</button><button onclick="closeModal()" style="background:var(--purple);color:#fff;border:none;padding:9px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600">Guardar Producto</button></div>`,
+  cliente:`<div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between"><div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700">Nuevo Cliente</div><button onclick="closeModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted)">✕</button></div><div class="fg"><div class="fgg"><label class="fgl">Nombre completo</label><input type="text" class="fc" placeholder="Nombre y apellidos"></div><div class="fgg"><label class="fgl">Teléfono</label><input type="text" class="fc" placeholder="310 000 0000"></div><div class="fgg"><label class="fgl">Correo electrónico</label><input type="email" class="fc" placeholder="cliente@email.com"></div><div class="fgg"><label class="fgl">Ciudad</label><select class="fc"><option>Bogotá</option><option>Medellín</option><option>Cali</option><option>Otra</option></select></div><div class="fgg" style="grid-column:1/-1"><label class="fgl">Estado</label><select class="fc"><option>Activo</option><option>Inactivo</option><option>Prospecto</option></select></div></div><div style="padding:0 20px 20px;display:flex;gap:10px;justify-content:flex-end"><button onclick="closeModal()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:9px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit">Cancelar</button><button onclick="closeModal()" style="background:var(--purple);color:#fff;border:none;padding:9px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600">Guardar Cliente</button></div>`
+};
+function showModal(t){document.getElementById('mi').innerHTML=MTPL[t]||'';document.getElementById('mo').style.display='block';document.getElementById('mb').style.display='block';}
+function closeModal(){document.getElementById('mo').style.display='none';document.getElementById('mb').style.display='none';}
+</script>
+</body>
+</html>
